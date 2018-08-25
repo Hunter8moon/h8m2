@@ -1,0 +1,11 @@
+GPU drivers:
+ - CUDA  9.0
+ - cuDNN 7005
+
+In case of 'vs 14 error':
+  - Install Windows SDK
+
+For scripts (optional):
+ - imagemagick
+ - ffmpeg
+
