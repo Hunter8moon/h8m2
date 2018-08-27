@@ -59,8 +59,8 @@ def train(config: Config, cyclegan: CycleGAN):
 
 
 if __name__ == '__main__':
-    # In case of weird out of memory error, try this:
     # memory_hackermann()
+    # In case of CUDNN_STATUS_INTERNAL_ERROR, try this:
 
     config = Config()
     dataset = Dataset(config)
