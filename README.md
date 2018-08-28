@@ -9,7 +9,7 @@ To test:
 
 To train:
 ```
- $ python main_train.py <dir_input>
+ $ python main_train.py
 ```
 
 For now just edit ./source/util/config.py to change hyperparameters.
