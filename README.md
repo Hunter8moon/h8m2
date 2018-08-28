@@ -3,7 +3,7 @@ Implementation of CycleGAN in Keras.
 
 To test:
 ```
- $ python main_test.py &lt;dir_input&gt; &lt;dir_output&gt; &lt;filename_model&gt;
+ $ python main_test.py <dir_input> <dir_output> <filename_model>
 ```
 
 
