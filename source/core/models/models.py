@@ -20,13 +20,11 @@ The discriminator core is: C64-C128-C256-C512
 class Discriminator:
     @staticmethod
     def build_model(config: Config):
-        input_shape = config.image_shape
-        filters = config.dis_filters
-
         lb = LayerBuilder(config, use_spectral_norm=config.use_spectral_normalization)
         lb.kernel_size = 4
+        filters = config.dis_filters
 
-        input = Input(shape=input_shape)
+        input = Input(shape=config.image_shape)
 
         c1 = lb.convolution(input, filters, activation=LeakyReLU(0.2), normalize=False)  # C64
         c2 = lb.convolution(c1, filters * 2, activation=LeakyReLU(0.2))  # C128

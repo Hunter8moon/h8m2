@@ -62,20 +62,40 @@ class WarmRestart(Schedule):
     From: https://arxiv.org/abs/1608.03983
     """
 
-    def __init__(self, max_value=0.0002, min_value=0.00001, cycle_length=10, cycle_multiplier=2, decay_rate=0.9):
+    def __init__(self, start_value=0.0002, min_value=0.00001, cycle_length=25, cycle_multiplier=2, decay_rate=0.75):
         super().__init__()
-        self.max = max_value
+        self.max = start_value
         self.min = min_value
-        self.t = cycle_length
-        self.t_mult = cycle_multiplier
+
+        self.idx = 0
+        self.start = 0
+        self.next = cycle_length
+
+        self.cycle_length = cycle_length
+        self.cycle_multiplier = cycle_multiplier
         self.decay_rate = decay_rate
 
-    def update(self, epoch):
-        t_cur = epoch % self.t
-        current_value = self.min + 0.5 * (self.max - self.min) * (1 + math.cos((t_cur / self.t) * math.pi))
+    def f(self, epoch):
+        epoch = int(epoch)
 
-        decay = self.decay_rate ** (epoch // self.t)
-        current_value *= decay
+        m = (self.max - self.min) / 2.0
+
+        t_cur = epoch - self.start
+        t = (t_cur / self.cycle_length)
+        current_value = self.min + m * (1 + math.cos(t * math.pi))
+
+        if epoch == self.next:
+            self.idx += 1
+            self.start = epoch
+            self.next += (self.cycle_length * self.cycle_multiplier)
+            self.cycle_length *= self.cycle_multiplier
+            print(epoch - self.start)
+
+        current_value = current_value * (self.decay_rate ** self.idx)
+        return current_value
+
+    def update(self, epoch):
+        current_value = self.f(epoch)
 
         if self.variables and isinstance(self.variables[0], Variable):
             for var in self.variables:

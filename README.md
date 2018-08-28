@@ -57,6 +57,7 @@ self.adversarial_loss = AdversarialLoss.WGAN
 * Decay schedules for hyperparameters (linear decay, warm restarts and 'identity' schedule)
 ```python
 # in config.py
-self.lr_g_schedule = LinearSchedule(start_value=0.0002, end_value=0, start_epoch=100, end_epoch=200) 
+self.lr_g_schedule = LinearSchedule(start_value=0.0002, end_value=0, start_epoch=100, end_epoch=200)
+self.lr_d_schedule = WarmRestart(start_value=0.0002, min_value=0.00001, cycle_length=25, cycle_multiplier=2, decay_rate=0.75)
 ```
 
