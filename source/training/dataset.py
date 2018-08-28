@@ -10,8 +10,7 @@ from util.image_util import ImageUtil
 
 class Dataset:
     def __init__(self, config: Config):
-        self.dataset_path = os.path.join(config.train_dataset_dir, config.dataset_name)
-        self.name = config.dataset_name
+        self.dataset_path = os.path.join(config.dir_input, config.name_dataset)
         self.shape = config.image_shape
 
         # Load the files in each folder

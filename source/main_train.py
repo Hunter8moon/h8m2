@@ -1,12 +1,7 @@
-import sys
-
-from core.cyclegan import CycleGAN
 from core.models.models import *
-from predictor import Predictor
 from training.dataset import Dataset
 from training.trainer import Trainer
-from util.config import Config
-from util.save_util import SaveUtil
+from util.save_util import *
 
 
 def memory_hackermann():
@@ -16,20 +11,6 @@ def memory_hackermann():
     c.gpu_options.allow_growth = True
     c.gpu_options.per_process_gpu_memory_fraction = 0.6
     set_session(tf.Session(config=c))
-
-
-def predict(config: Config, cyclegan: CycleGAN, a_to_b=True):
-    """
-    Translate an entire folder from A -> B or vice versa.
-
-    Input dir = config.predict_input_dir
-    Output dir = config.predict_output_dir
-    """
-
-    f = cyclegan.a_to_b if a_to_b else cyclegan.b_to_a
-
-    predictor = Predictor(f, config.image_shape)
-    predictor.predict_directory(config.predict_input_dir, config.predict_output_dir)
 
 
 def train(config: Config, cyclegan: CycleGAN):
@@ -43,12 +24,14 @@ def train(config: Config, cyclegan: CycleGAN):
     # Callback for saving checkpoints.
     def checkpoint(epoch):
         if epoch % config.checkpoint_interval == 0:
-            save_util.save_checkpoint(epoch, cyclegan)
+            directory = f'{config.dir_output}/{config.name_dataset}/checkpoints/'
+            save_checkpoint(epoch, cyclegan, config.n_epochs, directory)
 
     # Callback for saving snapshots.
     def snapshot(iteration):
         if iteration % config.snapshot_interval == 0:
-            save_util.save_snapshot(iteration, cyclegan)
+            directory = f'{config.dir_output}/{config.name_dataset}/snapshots/'
+            save_snapshot(iteration, cyclegan, dataset.batch_test(1), config.image_shape, directory)
 
     # Register callbacks
     trainer.on_epoch_start.append(checkpoint)
@@ -59,15 +42,15 @@ def train(config: Config, cyclegan: CycleGAN):
 
 
 if __name__ == '__main__':
-    # memory_hackermann()
     # In case of CUDNN_STATUS_INTERNAL_ERROR, try this:
+    memory_hackermann()
 
     config = Config()
     dataset = Dataset(config)
-    save_util = SaveUtil(config, dataset)
 
     if config.load_checkpoint:
-        gen_a, gen_b, dis_a, dis_b, epoch = save_util.load_models()
+        directory = f'{config.dir_output}/checkpoints/'
+        gen_a, gen_b, dis_a, dis_b, epoch = load_models(directory)
     else:
         dis_a = Discriminator.build_model(config)
         dis_b = Discriminator.build_model(config)
@@ -77,10 +60,4 @@ if __name__ == '__main__':
 
     cyclegan = CycleGAN(config, dis_a, dis_b, gen_a, gen_b)
 
-    args = sys.argv
-    if len(args) < 2:
-        train(config, cyclegan)
-    if args[1] == "train":
-        train(config, cyclegan)
-    if args[1] == "predict":
-        predict(config, cyclegan)
+    train(config, cyclegan)

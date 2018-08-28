@@ -1,8 +1,6 @@
 from keras.optimizers import Adam
 
 from core.decay import *
-
-
 # TODO: Config serialization/deserialization + change settings via parameters
 from core.losses.loss_terms_base import AdversarialLoss
 
@@ -53,17 +51,11 @@ class Config:
         # Folders #
         ###########
         # Training
-        self.train_dataset_dir = r'../resources/input/dataset/'
-        self.snapshot_dir = f'../resources/output/snapshots/'
-        self.checkpoints_dir = r'../resources/output/checkpoints/'
-        self.log_dir = r'../resources/output/logs/'
+        self.dir_input = r'../resources/input/'
+        self.dir_output = f'../resources/output/'
 
         self.dataset_name = r'cityscapes_jpg'
         self.folder_train_a = r'trainA'
         self.folder_train_b = r'trainB'
         self.folder_test_a = r'testA'
         self.folder_test_b = r'testB'
-
-        # Predict
-        self.predict_input_dir = r'../resources/input/predict/'
-        self.predict_output_dir = r'../resources/output/predict/'

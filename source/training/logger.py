@@ -17,11 +17,12 @@ class Logger:
 
         self.use_cycle_loss = config.use_cycle_loss
         self.use_identity_loss = config.use_identity_loss
+        self.log_dir = f"{config.dir_output}/{config.name_dataset}/logs/"
 
-        logname = f"{time.time()}_log.csv"
-        self.callback = TensorBoard(config.log_dir, write_graph=False)
+        logname = f"log_{time.time()}.csv"
+        self.callback = TensorBoard(self.log_dir, write_graph=False)
         self.callback.set_model(self.generative_model)
-        self.writer = csv.writer(open(f'{config.log_dir}/{logname}', "w", newline=''))
+        self.writer = csv.writer(open(f'{self.log_dir}/{logname}', "w", newline=''))
         self.start_time = datetime.datetime.now()
         self.init = False
 
@@ -31,7 +32,7 @@ class Logger:
         """
 
         elapsed = datetime.datetime.now() - self.start_time
-        print(f"Epoch [{epoch}] [{batch_idx}/{n_batches}] \t| Elapsed {elapsed} \t| Loss (D) {loss_d[1:]}\t| Loss (G) {loss_g[1:]}")
+        print(f"Epoch [{epoch}] [{batch_idx}/{n_batches}] \t| Elapsed {elapsed} \t| Loss (D) {loss_d[0]}\t| Loss (G) {loss_g[0]}")
 
         values = self.collect_values(loss_d, loss_g)
         self.log_to_tensorboard(iteration, values)

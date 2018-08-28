@@ -17,7 +17,6 @@ class LayerBuilder:
         self.padding_method = ReflectionPadding2D
 
         self.init = RandomNormal(mean=0, stddev=0.02)
-        self.init = he_normal()
         self.norm = InstanceNormalization()
 
         if use_spectral_norm:
