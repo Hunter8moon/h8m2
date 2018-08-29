@@ -39,18 +39,16 @@ class Logger:
         self.log_to_csv(iteration, values)
 
     def collect_values(self, loss_d, loss_g):
-        values = [('hyperparameters/learning rate (gen)',
-                   backend.get_value(self.cyclegan.generative_model.model.optimizer.lr)),
+        values = [('hyperparameters/learning rate (gen)', backend.get_value(self.cyclegan.generative_model.model.optimizer.lr)),
+                  ('hyperparameters/learning rate (dis)', backend.get_value(self.cyclegan.discriminative_model.model.optimizer.lr)),
                   ('hyperparameters/lambda gan loss (gen)', backend.get_value(self.cyclegan.l_gan_g)),
                   ('hyperparameters/lambda gan loss (dis)', backend.get_value(self.cyclegan.l_gan_d))]
 
         if self.use_cycle_loss:
-            values.append(('hyperparameters/lambda cycle loss',
-                           backend.get_value(self.cyclegan.l_cycle)))
+            values.append(('hyperparameters/lambda cycle loss', backend.get_value(self.cyclegan.l_cycle)))
 
         if self.use_identity_loss:
-            values.append(('hyperparameters/lambda identity loss',
-                           backend.get_value(self.cyclegan.l_id)))
+            values.append(('hyperparameters/lambda identity loss', backend.get_value(self.cyclegan.l_id)))
 
         values.extend(loss_g)
         values.extend(loss_d)

@@ -29,7 +29,7 @@ class RelativisticLoss(Layer):
 
 class RLSGAN_Discriminator(LossTerm):
     def __init__(self, weight=1):
-        super().__init__(names=['dis_a_r', 'dis_a_f'],
+        super().__init__(names=['dis_a', 'dis_b'],
                          weights=[weight, weight])
 
     def compile(self, dis_a, dis_b, gen_a, gen_b, real_a, fake_a, real_b, fake_b):
@@ -56,7 +56,7 @@ class RLSGAN_Generator(LossTerm):
     """
 
     def __init__(self, weight=1):
-        super().__init__(names=['dis_a_r', 'dis_a_f'],
+        super().__init__(names=['dis_a', 'dis_b'],
                          weights=[weight, weight])
 
     def compile(self, dis_a, dis_b, gen_a, gen_b, real_a, fake_a, real_b, fake_b):

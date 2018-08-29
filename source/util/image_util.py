@@ -1,5 +1,5 @@
 import os
-from random import randint
+from random import randint, random
 
 import numpy as np
 from PIL import Image
@@ -39,8 +39,8 @@ class ImageUtil:
         y = randint(0, y_add)
 
         # TODO flipping?
-        # if random() >= 0.5:
-        #     im = im.transpose(Image.FLIP_LEFT_RIGHT)
+        if random() >= 0.5:
+            im = im.transpose(Image.FLIP_LEFT_RIGHT)
 
         im = im.resize((width + x_add, height + y_add))
         im = im.crop((x, y, x + width, y + height))

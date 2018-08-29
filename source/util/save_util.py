@@ -8,6 +8,7 @@ from keras_contrib.layers import InstanceNormalization
 
 from core.cyclegan import CycleGAN
 from core.reflection_padding import ReflectionPadding2D
+from core.spectral_normalization import *
 from util.image_util import ImageUtil
 
 
@@ -77,7 +78,14 @@ def load_single_model(model_name, dir_checkpoints):
 
 def load_model_checkpoint(model_filename):
     custom_objects = {'ReflectionPadding2D': ReflectionPadding2D,
-                      "InstanceNormalization": InstanceNormalization}
+                      "InstanceNormalization": InstanceNormalization,
+                      "ConvSN2DTranspose": ConvSN2DTranspose,
+                      "EmbeddingSN": EmbeddingSN,
+                      "ConvSN3D": ConvSN3D,
+                      "ConvSN1D": ConvSN1D,
+                      "ConvSN2D": ConvSN2D,
+                      "DenseSN": DenseSN,
+                      }
     model = load_model(model_filename, custom_objects=custom_objects)
     return model
 

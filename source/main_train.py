@@ -49,7 +49,7 @@ if __name__ == '__main__':
     dataset = Dataset(config)
 
     if config.load_checkpoint:
-        directory = f'{config.dir_output}/checkpoints/'
+        directory = f'{config.dir_output}/{config.name_dataset}/checkpoints/'
         gen_a, gen_b, dis_a, dis_b, epoch = load_models(directory)
     else:
         dis_a = Discriminator.build_model(config)
