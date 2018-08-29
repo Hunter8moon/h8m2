@@ -3,9 +3,11 @@ import sys
 from glob import glob
 
 import numpy as np
+from PIL import Image
+from keras import Model
 
 from util.image_util import ImageUtil
-from util.save_util import load_model_checkpoint
+from util.save_util import load_model_checkpoint, Input
 
 
 def memory_hackermann():
@@ -70,12 +72,31 @@ def test_directory(input_dir, output_dir, model, image_shape):
         print(f" Done saving: {filename}")
 
 
+def make_input_size_flexible(model):
+    model.layers.pop(0)
+
+    input_layer = Input(batch_shape=(None, None, None, 3))
+    output_layer = model(input_layer)
+    out_model = Model(input_layer, output_layer)
+
+    return out_model
+
+
+def get_image_shape(dir_input):
+    file = glob(f'{dir_input}/*')
+    img = Image.open(file[0])
+    width, height = img.size
+    return width, height, 3
+
+
 if __name__ == '__main__':
     # In case of CUDNN_STATUS_INTERNAL_ERROR, try this:
-    memory_hackermann()
+    # memory_hackermann()
 
     dir_input, dir_output, filename_model = parse_args()
+
     gen = load_model_checkpoint(filename_model)
-    image_shape = list(gen.output_shape)[1:]
+    gen = make_input_size_flexible(gen)
+    image_shape = get_image_shape(dir_input)
 
     test_directory(dir_input, dir_output, gen, image_shape)
