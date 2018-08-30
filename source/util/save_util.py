@@ -20,8 +20,8 @@ def save_checkpoint(current_epoch: int, cyclegan: CycleGAN, n_epochs: int, dir_c
     if not os.path.exists(dir_checkpoints):
         os.makedirs(dir_checkpoints)
 
-    l = int(math.log10(n_epochs)) + 1
-    n = str(current_epoch).zfill(l)
+    width = int(math.log10(n_epochs)) + 1
+    n = str(current_epoch).zfill(width)
     cyclegan.gen_a.save(f"{dir_checkpoints}/{n}_gen_a.h5")
     cyclegan.gen_b.save(f"{dir_checkpoints}/{n}_gen_b.h5")
     cyclegan.dis_a.save(f"{dir_checkpoints}/{n}_dis_a.h5")
@@ -36,7 +36,7 @@ def save_snapshot(iteration: int, cyclegan: CycleGAN, test_batch, image_shape: (
     on the bottom row: real_b, gen_b(real_b), gen_a(gen_b(real_b)).
     """
 
-    def create_snapshot(cyclegan, real_a, real_b):
+    def create_snapshot():
         a, b = [real_a], [real_b]
         fake_b = cyclegan.a_to_b(real_a)
         fake_a = cyclegan.b_to_a(real_b)
@@ -61,7 +61,7 @@ def save_snapshot(iteration: int, cyclegan: CycleGAN, test_batch, image_shape: (
         os.makedirs(dir_snapshots)
 
     real_a, real_b = test_batch
-    outputs = create_snapshot(cyclegan, real_a, real_b)
+    outputs = create_snapshot()
 
     img = ImageUtil.make_snapshot_image(outputs, image_shape[0], image_shape[1])
     ImageUtil.save(img, dir_snapshots, f"{iteration:010d}")

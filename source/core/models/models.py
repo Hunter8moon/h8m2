@@ -5,19 +5,19 @@ from core.layer_builder import LayerBuilder
 from core.reflection_padding import ReflectionPadding2D
 from util.config import Config
 
-"""
-https://arxiv.org/pdf/1703.10593.pdf
-
-
-For discriminator networks, we use 70×70 PatchGAN [21].  
-Let Ck denote a 4 × 4 Convolution-InstanceNorm-LeakyReLU layer with k filters and stride 2.  
-After the last layer, we apply a convolution to produce a 1 dimensional output.   
-We do not use InstanceNorm for the first C64 layer. We use leaky ReLUs with slope 0.2. 
-The discriminator core is: C64-C128-C256-C512 
-"""
-
 
 class Discriminator:
+    """
+    https://arxiv.org/pdf/1703.10593.pdf
+
+
+    For discriminator networks, we use 70×70 PatchGAN [21].
+    Let Ck denote a 4 × 4 Convolution-InstanceNorm-LeakyReLU layer with k filters and stride 2.
+    After the last layer, we apply a convolution to produce a 1 dimensional output.
+    We do not use InstanceNorm for the first C64 layer. We use leaky ReLUs with slope 0.2.
+    The discriminator core is: C64-C128-C256-C512
+    """
+
     @staticmethod
     def build_model(config: Config):
         lb = LayerBuilder(config, use_spectral_norm=config.use_spectral_normalization)
@@ -84,16 +84,14 @@ class GeneratorUNet:
         return model
 
 
-"""
-Let c7s1-k denote a 7×7 Convolution-InstanceNorm-ReLU layer with k filters and stride 1. 
-dk denotes a 3×3 Convolution-InstanceNorm-ReLU layer with k filters, and stride 2. Reflection padding was used to reduce artifacts.
-Rk denotes a residual block that contains two 3 × 3 convolutional layers with the same number of filters on both layer. 
-uk denotes a 3×3 fractional-strided-Convolution-InstanceNorm-ReLU layer with k filters, and stride 1/2. 
-The network with 6 blocks consists of: c7s1-32,d64,d128,R128,R128,R128,R128,R128,R128,u64,u32,c7s1-3
-"""
-
-
 class GeneratorResidual:
+    """
+    Let c7s1-k denote a 7×7 Convolution-InstanceNorm-ReLU layer with k filters and stride 1.
+    dk denotes a 3×3 Convolution-InstanceNorm-ReLU layer with k filters, and stride 2. Reflection padding was used to reduce artifacts.
+    Rk denotes a residual block that contains two 3 × 3 convolutional layers with the same number of filters on both layer.
+    uk denotes a 3×3 fractional-strided-Convolution-InstanceNorm-ReLU layer with k filters, and stride 1/2.
+    The network with 6 blocks consists of: c7s1-32,d64,d128,R128,R128,R128,R128,R128,R128,u64,u32,c7s1-3
+    """
 
     @staticmethod
     def build_model(config: Config):
@@ -128,12 +126,10 @@ class GeneratorResidual:
         return model
 
 
-"""
-Residual generator without fancy reflection padding and 4 × 4 kernels for every layer.
-"""
-
-
 class GeneratorResidualSimple:
+    """
+    Residual generator without fancy reflection padding and 4 × 4 kernels for every layer.
+    """
 
     @staticmethod
     def build_model(config: Config):
