@@ -28,12 +28,6 @@ class LayerBuilder:
             self.conv2d = Conv2D
             self.conv2d_t = Conv2DTranspose
 
-    def deconvolution_skip(self, input_layer, skip_layer, filters, kernel_size=None, strides=None, dropout_rate=None, dropout=False, normalize=True, activation='relu'):
-        output = self.deconvolution(input_layer, filters, kernel_size, strides, dropout_rate, dropout, normalize, activation)
-        output = Concatenate()([output, skip_layer])
-
-        return output
-
     def residual(self, input, filters, kernel_size=None):
         skip_layer = input
 
@@ -58,7 +52,13 @@ class LayerBuilder:
         output = Activation(activation='relu')(output)
         return output
 
-    def deconvolution(self, input_layer, filters, kernel_size=None, strides=None, dropout_rate=None, dropout=False, normalize=True, activation='relu'):
+    def convolution_transpose_skip(self, input_layer, skip_layer, filters, kernel_size=None, strides=None, dropout_rate=None, dropout=False, normalize=True, activation='relu'):
+        output = self.convolution_transpose(input_layer, filters, kernel_size, strides, dropout_rate, dropout, normalize, activation)
+        output = Concatenate()([output, skip_layer])
+
+        return output
+
+    def convolution_transpose(self, input_layer, filters, kernel_size=None, strides=None, dropout_rate=None, dropout=False, normalize=True, activation='relu'):
         if not kernel_size:
             kernel_size = self.kernel_size
         if not strides:

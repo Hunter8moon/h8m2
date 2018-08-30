@@ -36,11 +36,32 @@ def save_snapshot(iteration: int, cyclegan: CycleGAN, test_batch, image_shape: (
     on the bottom row: real_b, gen_b(real_b), gen_a(gen_b(real_b)).
     """
 
+    def create_snapshot(cyclegan, real_a, real_b):
+        a, b = [real_a], [real_b]
+        fake_b = cyclegan.a_to_b(real_a)
+        fake_a = cyclegan.b_to_a(real_b)
+        a.append(fake_b)
+        b.append(fake_a)
+
+        if cyclegan.config.use_cycle_loss:
+            cycle_a = cyclegan.b_to_a(fake_b)
+            cycle_b = cyclegan.a_to_b(fake_a)
+            a.append(cycle_a)
+            b.append(cycle_b)
+
+        if cyclegan.config.use_identity_loss:
+            id_a = cyclegan.b_to_a(real_a)
+            id_b = cyclegan.a_to_b(real_b)
+            a.append(id_a)
+            b.append(id_b)
+
+        return [a, b]
+
     if not os.path.exists(dir_snapshots):
         os.makedirs(dir_snapshots)
 
     real_a, real_b = test_batch
-    outputs = cyclegan.cycle(real_a, real_b)
+    outputs = create_snapshot(cyclegan, real_a, real_b)
 
     img = ImageUtil.make_snapshot_image(outputs, image_shape[0], image_shape[1])
     ImageUtil.save(img, dir_snapshots, f"{iteration:010d}")

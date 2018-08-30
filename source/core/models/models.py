@@ -42,6 +42,7 @@ class GeneratorUNet:
     def build_model(config: Config):
         lb = LayerBuilder(config)
         lb.kernel_size = 4
+
         base_filters = config.gen_filters
         max_filters = int(base_filters * 8)
         n = int(np.log2(config.image_shape[0]))
@@ -74,7 +75,7 @@ class GeneratorUNet:
             filters = int(min(base_filters * (2 ** (j - 1)), max_filters))
 
             prev = deconvolutions[-1]
-            deconv = lb.deconvolution_skip(prev, skip, filters, dropout=dropout)
+            deconv = lb.convolution_transpose_skip(prev, skip, filters, dropout=dropout)
             deconvolutions.append(deconv)
 
         output = lb.convolution(deconvolutions[-1], config.channels, strides=1, activation='tanh', normalize=False)
@@ -98,6 +99,7 @@ class GeneratorResidual:
     def build_model(config: Config):
         lb = LayerBuilder(config)
         lb.kernel_size = 3
+
         padding_method = ReflectionPadding2D
         filters = config.gen_filters
         padding = ((1, 1), (1, 1))
@@ -116,8 +118,8 @@ class GeneratorResidual:
         for i in range(config.residual_blocks):
             output = lb.residual_padded(output, filters * 4, padding=padding)
 
-        output = lb.deconvolution(output, filters * 2, strides=2)
-        output = lb.deconvolution(output, filters, strides=2)
+        output = lb.convolution_transpose(output, filters * 2, strides=2)
+        output = lb.convolution_transpose(output, filters, strides=2)
         output = padding_method(outer_padding)(output)
 
         output = lb.convolution(output, config.channels, kernel_size=outer_kernel_size, strides=1, padding='valid', activation='tanh', normalize=False)
@@ -152,8 +154,8 @@ class GeneratorResidualSimple:
             output = lb.residual(output, filters * 4)
 
         # Decoder
-        output = lb.deconvolution(output, filters * 2, strides=2)
-        output = lb.deconvolution(output, filters, strides=2)
+        output = lb.convolution_transpose(output, filters * 2, strides=2)
+        output = lb.convolution_transpose(output, filters, strides=2)
         output = lb.convolution(output, config.channels, strides=1, activation='tanh', normalize=False)
 
         model = Model(input, output)

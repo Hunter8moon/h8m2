@@ -3,15 +3,6 @@ from core.losses.wasserstein_loss import *
 from core.models.combined_models import *
 
 
-def get_shape(batch_size: int, model: Model):
-    t = model.output_shape
-    lst = list(t)
-    lst[0] = batch_size
-    s = tuple(lst)
-
-    return s
-
-
 class CycleGAN:
     def __init__(self,
                  config: Config,
@@ -33,6 +24,7 @@ class CycleGAN:
         self.l_gan_d = K.variable(1)
         self.l_gan_g = K.variable(1)
         self.l_cycle = K.variable(1)
+        self.l_gp = K.variable(1)
         d_loss_terms, g_loss_terms = self.initialize_loss_terms(config)
 
         # Combine adversarial and generative models
@@ -59,11 +51,13 @@ class CycleGAN:
         """
         Returns two lists of loss terms for the discriminator and generator.
         """
+
         d_loss_terms = []
         g_loss_terms = []
 
         if config.adversarial_loss == AdversarialLoss.WGAN:
             d_loss_terms.append(WGAN_Discriminator(weight=self.l_gan_d))
+            d_loss_terms.append(LipschitzPenalty(weight=self.l_gp))
             g_loss_terms.append(WGAN_Generator(weight=self.l_gan_g))
 
         if config.adversarial_loss == AdversarialLoss.RaLSGAN:
@@ -86,6 +80,7 @@ class CycleGAN:
         """
         Binds the hyperparameters to their respective schedules.
         """
+
         self.schedules.append(config.lr_g_schedule)
         config.lr_g_schedule.bind_to_variables([self.generative_model.model.optimizer.lr])
 
@@ -94,6 +89,10 @@ class CycleGAN:
 
         self.schedules.append(config.l_dis_schedule)
         config.l_dis_schedule.bind_to_variables([self.l_gan_g])
+
+        if config.adversarial_loss == AdversarialLoss.WGAN:
+            self.schedules.append(config.l_gp_schedule)
+            config.l_gp_schedule.bind_to_variables([self.l_gp])
 
         if config.use_cycle_loss:
             self.schedules.append(config.l_cycle_schedule)
@@ -118,14 +117,3 @@ class CycleGAN:
     def update_hyperparameters(self, epoch):
         for s in self.schedules:
             s.update(epoch)
-
-    def cycle(self, real_a, real_b):
-        fake_b = self.a_to_b(real_a)
-        cycle_a = self.b_to_a(fake_b)
-
-        fake_a = self.b_to_a(real_b)
-        cycle_b = self.a_to_b(fake_a)
-
-        aba = [real_a, fake_b, cycle_a]
-        bab = [real_b, fake_a, cycle_b]
-        return [aba, bab]

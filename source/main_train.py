@@ -24,14 +24,12 @@ def train(config: Config, cyclegan: CycleGAN):
     # Callback for saving checkpoints.
     def checkpoint(epoch):
         if epoch % config.checkpoint_interval == 0:
-            directory = f'{config.dir_output}/{config.name_dataset}/checkpoints/'
-            save_checkpoint(epoch, cyclegan, config.n_epochs, directory)
+            save_checkpoint(epoch, cyclegan, config.n_epochs, dir_checkpoints)
 
     # Callback for saving snapshots.
     def snapshot(iteration):
         if iteration % config.snapshot_interval == 0:
-            directory = f'{config.dir_output}/{config.name_dataset}/snapshots/'
-            save_snapshot(iteration, cyclegan, dataset.batch_test(1), config.image_shape, directory)
+            save_snapshot(iteration, cyclegan, dataset.batch_test(1), config.image_shape, dir_snapshots)
 
     # Register callbacks
     trainer.on_epoch_start.append(checkpoint)
@@ -47,10 +45,11 @@ if __name__ == '__main__':
 
     config = Config()
     dataset = Dataset(config)
+    dir_snapshots = f'{config.dir_output}/{config.name_dataset}/snapshots/'
+    dir_checkpoints = f'{config.dir_output}/{config.name_dataset}/checkpoints/'
 
     if config.load_checkpoint:
-        directory = f'{config.dir_output}/{config.name_dataset}/checkpoints/'
-        gen_a, gen_b, dis_a, dis_b, epoch = load_models(directory)
+        gen_a, gen_b, dis_a, dis_b, epoch = load_models(dir_checkpoints)
     else:
         dis_a = Discriminator.build_model(config)
         dis_b = Discriminator.build_model(config)
