@@ -17,23 +17,25 @@ class LayerBuilder:
         self.padding_method = ReflectionPadding2D
 
         self.init = RandomNormal(mean=0, stddev=0.02)
-        self.norm = InstanceNormalization()
 
         if use_spectral_norm:
             self.dense = DenseSN
             self.conv2d = ConvSN2D
             self.conv2d_t = ConvSN2DTranspose
+            self.norm = Lambda(lambda x: x)
         else:
             self.dense = Dense
             self.conv2d = Conv2D
             self.conv2d_t = Conv2DTranspose
+            self.norm = InstanceNormalization()
 
-    def residual(self, input, filters, kernel_size=None):
+    def residual_block(self, input, filters, kernel_size=None):
         skip_layer = input
 
         output = self.convolution(input, filters, strides=1, kernel_size=kernel_size)
         output = self.convolution(output, filters, strides=1, kernel_size=kernel_size, activation=None)
         output = Add()([output, skip_layer])
+        output = Activation(activation='relu')(output)
 
         return output
 

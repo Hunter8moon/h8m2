@@ -28,7 +28,7 @@ def save_checkpoint(current_epoch: int, cyclegan: CycleGAN, n_epochs: int, dir_c
     cyclegan.dis_b.save(f"{dir_checkpoints}/{n}_dis_b.h5")
 
 
-def save_snapshot(iteration: int, cyclegan: CycleGAN, test_batch, image_shape: (int, int, int), dir_snapshots: str):
+def save_snapshot(epoch: int, batch: int, cyclegan: CycleGAN, test_batch, image_shape: (int, int, int), dir_snapshots: str):
     """
     Saves a snapshot of the current iteration to {self.snapshot_dir}/{self.dataset.name}.
     Snapshot shows;
@@ -64,7 +64,7 @@ def save_snapshot(iteration: int, cyclegan: CycleGAN, test_batch, image_shape: (
     outputs = create_snapshot()
 
     img = ImageUtil.make_snapshot_image(outputs, image_shape[0], image_shape[1])
-    ImageUtil.save(img, dir_snapshots, f"{iteration:010d}")
+    ImageUtil.save(img, dir_snapshots, f"{epoch:04d}_{batch:06d}")
 
 
 def load_single_model(model_name, dir_checkpoints):

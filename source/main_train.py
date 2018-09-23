@@ -27,9 +27,9 @@ def train(config: Config, cyclegan: CycleGAN):
             save_checkpoint(epoch, cyclegan, config.n_epochs, dir_checkpoints)
 
     # Callback for saving snapshots.
-    def snapshot(iteration):
-        if iteration % config.snapshot_interval == 0:
-            save_snapshot(iteration, cyclegan, dataset.batch_test(1), config.image_shape, dir_snapshots)
+    def snapshot(epoch, batch):
+        if batch % config.snapshot_interval == 0:
+            save_snapshot(epoch, batch, cyclegan, dataset.batch_test(1), config.image_shape, dir_snapshots)
 
     # Register callbacks
     trainer.on_epoch_start.append(checkpoint)
@@ -41,13 +41,13 @@ def train(config: Config, cyclegan: CycleGAN):
 
 if __name__ == '__main__':
     # In case of CUDNN_STATUS_INTERNAL_ERROR, try this:
-    # memory_hackermann()
+    memory_hackermann()
 
     config = Config()
     dataset = Dataset(config)
+
     dir_snapshots = f'{config.dir_output}/{config.name_dataset}/snapshots/'
     dir_checkpoints = f'{config.dir_output}/{config.name_dataset}/checkpoints/'
-
     if config.load_checkpoint:
         gen_a, gen_b, dis_a, dis_b, epoch = load_models(dir_checkpoints)
     else:

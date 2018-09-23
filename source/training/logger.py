@@ -6,7 +6,7 @@ import tensorflow as tf
 from keras import backend
 from keras.callbacks import TensorBoard
 
-from core.cyclegan import CycleGAN, Config
+from core.cyclegan import CycleGAN, Config, AdversarialLoss
 
 
 class Logger:
@@ -14,9 +14,8 @@ class Logger:
         self.cyclegan = cyclegan
         self.generative_model = cyclegan.generative_model
         self.adversarial_model = cyclegan.discriminative_model
+        self.config = config
 
-        self.use_cycle_loss = config.use_cycle_loss
-        self.use_identity_loss = config.use_identity_loss
         self.log_dir = f"{config.dir_output}/{config.name_dataset}/logs/"
 
         logname = f"log_{time.time()}.csv"
@@ -41,14 +40,17 @@ class Logger:
     def collect_values(self, loss_d, loss_g):
         values = [('hyperparameters/learning rate (gen)', backend.get_value(self.cyclegan.generative_model.model.optimizer.lr)),
                   ('hyperparameters/learning rate (dis)', backend.get_value(self.cyclegan.discriminative_model.model.optimizer.lr)),
-                  ('hyperparameters/lambda gan loss (gen)', backend.get_value(self.cyclegan.l_gan_g)),
-                  ('hyperparameters/lambda gan loss (dis)', backend.get_value(self.cyclegan.l_gan_d))]
+                  ('hyperparameters/lambda adversarial loss (gen)', backend.get_value(self.cyclegan.l_gan_g)),
+                  ('hyperparameters/lambda adversarial loss (dis)', backend.get_value(self.cyclegan.l_gan_d))]
 
-        if self.use_cycle_loss:
+        if self.config.use_cycle_loss:
             values.append(('hyperparameters/lambda cycle loss', backend.get_value(self.cyclegan.l_cycle)))
 
-        if self.use_identity_loss:
+        if self.config.use_identity_loss:
             values.append(('hyperparameters/lambda identity loss', backend.get_value(self.cyclegan.l_id)))
+
+        if self.config.adversarial_loss == AdversarialLoss.WGAN:
+            values.append(('hyperparameters/lambda gradient penalty', backend.get_value(self.cyclegan.l_gp)))
 
         values.extend(loss_g)
         values.extend(loss_d)

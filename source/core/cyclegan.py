@@ -14,10 +14,10 @@ class CycleGAN:
         self.schedules = []
 
         # Build individual model
-        self.gen_a: Model = generator_a
-        self.gen_b: Model = generator_b
-        self.dis_a: Model = discriminator_a
-        self.dis_b: Model = discriminator_b
+        self.gen_a = generator_a
+        self.gen_b = generator_b
+        self.dis_a = discriminator_a
+        self.dis_b = discriminator_b
 
         # Initialize loss terms
         self.l_id = K.variable(1)
@@ -61,8 +61,8 @@ class CycleGAN:
             g_loss_terms.append(WGAN_Generator(weight=self.l_gan_g))
 
         if config.adversarial_loss == AdversarialLoss.RaLSGAN:
-            d_loss_terms.append(RLSGAN_Discriminator(weight=self.l_gan_d))
-            g_loss_terms.append(RLSGAN_Generator(weight=self.l_gan_g))
+            d_loss_terms.append(RaLSGAN_Discriminator(weight=self.l_gan_d))
+            g_loss_terms.append(RaLSGAN_Generator(weight=self.l_gan_g))
 
         if config.adversarial_loss == AdversarialLoss.LSGAN:
             d_loss_terms.append(LSGAN_Discriminator(weight=self.l_gan_d))
@@ -114,6 +114,6 @@ class CycleGAN:
     def a_to_b(self, image):
         return self.gen_a.predict(image)
 
-    def update_hyperparameters(self, epoch):
+    def update_hyperparameters(self, epoch, batch):
         for s in self.schedules:
             s.update(epoch)

@@ -1,6 +1,6 @@
 from keras.optimizers import Adam
 
-from core.decay import *
+from core.decay_schedules import *
 # TODO: Config serialization/deserialization + change settings via parameters
 from core.losses.loss_terms_base import AdversarialLoss
 
@@ -50,7 +50,6 @@ class Config:
         ###########
         # Folders #
         ###########
-        # Training
         self.dir_input = r'../resources/input/'
         self.dir_output = f'../resources/output/'
 

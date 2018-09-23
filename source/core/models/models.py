@@ -37,6 +37,8 @@ class Discriminator:
         return model
 
 
+
+
 class GeneratorUNet:
     @staticmethod
     def build_model(config: Config):
@@ -147,7 +149,7 @@ class GeneratorResidualSimple:
 
         # Residual blocks
         for i in range(config.residual_blocks):
-            output = lb.residual(output, filters * 4)
+            output = lb.residual_block(output, filters * 4)
 
         # Decoder
         output = lb.convolution_transpose(output, filters * 2, strides=2)

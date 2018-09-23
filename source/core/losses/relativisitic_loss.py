@@ -24,10 +24,14 @@ class RelativisticLoss(Layer):
         rel_avg_real = inputs[0] - pred_avg_fake
         rel_avg_fake = inputs[1] - pred_avg_real
 
-        return self.f1(rel_avg_real) + self.f2(rel_avg_fake)
+        return (self.f1(rel_avg_real) + self.f2(rel_avg_fake)) / 2.
 
 
-class RLSGAN_Discriminator(LossTerm):
+class RaLSGAN_Discriminator(LossTerm):
+    """
+    Relativistic average Least Squares GAN loss (for discriminator).
+    """
+
     def __init__(self, weight=1):
         super().__init__(names=['dis_a', 'dis_b'],
                          weights=[weight, weight])
@@ -50,9 +54,9 @@ class RLSGAN_Discriminator(LossTerm):
         return self.targets
 
 
-class RLSGAN_Generator(LossTerm):
+class RaLSGAN_Generator(LossTerm):
     """
-    Wasserstein adversarial loss (for generator).
+    Relativistic average Least Squares GAN loss (for generator).
     """
 
     def __init__(self, weight=1):
